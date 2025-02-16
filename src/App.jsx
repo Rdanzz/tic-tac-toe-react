@@ -22,6 +22,7 @@ const Board = () => {
   const [xIsNext, setXIsNext] = useState(true);
   const [winner, setWinner] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [message, setMessage] = useState(""); // Menyimpan pesan modal
 
   function handleClick(e) {
     if (squares[e] || winner) return;
@@ -33,7 +34,12 @@ const Board = () => {
     const newWinner = calculateWinner(nextSquares);
     if (newWinner) {
       setWinner(newWinner);
-      setModalIsOpen(true); // Tampilkan modal saat ada pemenang
+      setMessage(
+        newWinner === "Draw"
+          ? "Permainan Seri!"
+          : `Pemenangnya adalah ${newWinner}`
+      );
+      setModalIsOpen(true); // Tampilkan modal saat ada pemenang atau hasil seri
     }
   }
 
@@ -60,7 +66,7 @@ const Board = () => {
         ))}
       </motion.div>
 
-      {/* Modal Pemenang */}
+      {/* Modal Pemenang atau Seri */}
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={resetGame}
@@ -72,7 +78,7 @@ const Board = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-2xl font-bold text-gray-800"
         >
-          Pemenangnya adalah {winner}
+          {message}
         </motion.h2>
         <motion.button
           whileHover={{ scale: 1.1, backgroundColor: "#fde047", color: "#000" }}
@@ -90,6 +96,7 @@ const Board = () => {
   );
 };
 
+
 export default Board;
 
 function calculateWinner(squares) {
@@ -103,11 +110,19 @@ function calculateWinner(squares) {
     [0, 4, 8],
     [2, 4, 6],
   ];
+
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
       return squares[a];
     }
   }
+
+  // Jika semua kotak terisi dan tidak ada pemenang
+  if (!squares.includes(null)) {
+    return "Draw"; // Menyatakan hasil seri
+  }
+
   return null;
 }
+
